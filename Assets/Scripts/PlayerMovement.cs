@@ -5,17 +5,17 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] RectTransform canvas;
-    [SerializeField] float speed;
     [SerializeField] float rotationOffset;
+    public float speed;
 
-    CharacterController player;
+    Rigidbody player_rb;
     Vector2 inputPointA;
     Vector2 inputPointB;
     bool isTouched;
 
     private void Start()
     {
-        player = GetComponent<CharacterController>();
+        player_rb = GetComponent<Rigidbody>();
     }
 
     private void Update()
@@ -43,12 +43,12 @@ public class PlayerMovement : MonoBehaviour
             Vector2 direction = Vector2.ClampMagnitude(offset, 1f);
 
             //move
-            player.Move(new Vector3(direction.x, 0, direction.y) * Time.deltaTime * speed);
+            player_rb.MovePosition(player_rb.position + new Vector3(direction.x, 0, direction.y) * Time.deltaTime * speed);
 
             //rotation
             float angle;
             angle = Mathf.Atan2(direction.x, direction.y) * Mathf.Rad2Deg + rotationOffset;
-            player.transform.rotation = Quaternion.Euler(new Vector3(0, angle, 0));
+            player_rb.transform.rotation = Quaternion.Euler(new Vector3(0, angle, 0));
         }
     }
 }

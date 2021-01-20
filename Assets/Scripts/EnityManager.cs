@@ -37,20 +37,22 @@ public class EnityManager : MonoBehaviour
 
         spawnCoinTime = Time.time + spawnCoinDelayTime;
         spawnMushroomTime = Time.time + spawnMushroomDelayTime;
-        spawnPortalTime = Time.time + spawnPortalDelayTime;
+        //spawnPortalTime = Time.time + spawnPortalDelayTime;
     }
 
     public void SpawnEntity(float x, float z, Vector3 triggerPos)
     {
-        //Debug.Log("Куб " + x + " на " + z + " координаты:" + triggerPos);
-        if (Time.time > spawnTime) //задержка между спавнами
+        if (OnLoadSettings.gameEvent == GameEvent.InGame)
         {
-            spawnTime = Time.time + spawnDelayTime;
+            if (Time.time > spawnTime) //задержка между спавнами
+            {
+                spawnTime = Time.time + spawnDelayTime;
 
-            Vector3 pos = new Vector3(Random.Range(-x, x), entityPrefab.transform.localScale.y, Random.Range(-z, z)) + triggerPos; //координаты для спавна entity
+                Vector3 pos = new Vector3(Random.Range(-x, x), entityPrefab.transform.localScale.y, Random.Range(-z, z)) + triggerPos; //координаты для спавна entity
 
-            GameObject entity = SpawnSmallOrBigEntity(pos);
-            entityList.Add(entity);
+                GameObject entity = SpawnSmallOrBigEntity(pos);
+                entityList.Add(entity);
+            }
         }
     }
 
@@ -99,11 +101,11 @@ public class EnityManager : MonoBehaviour
             entity = GetMashroomPrefab(spawnPosition);
             spawnMushroomTime = Time.time + spawnMushroomDelayTime;
         }
-        else if (Time.time >= spawnPortalTime)
-        {
-            entity = Instantiate(PortalPrefab, spawnPosition, Quaternion.identity);
-            spawnPortalTime = Time.time + spawnPortalDelayTime;
-        }
+        //else if (Time.time >= spawnPortalTime)
+        //{
+        //    entity = Instantiate(PortalPrefab, spawnPosition, Quaternion.identity);
+        //    spawnPortalTime = Time.time + spawnPortalDelayTime;
+        //}
         else
         {
             int bigEntityCount = 0;
@@ -135,14 +137,19 @@ public class EnityManager : MonoBehaviour
             }
         }
 
-        entity.transform.position = new Vector3(spawnPosition.x, entity.transform.localScale.y + 0.5f, spawnPosition.z);
+        entity.transform.position = new Vector3(spawnPosition.x, entity.transform.localScale.y + 1.55f, spawnPosition.z);
+        
+        if (entity.CompareTag("Mushroom"))
+        {
+            entity.transform.position = new Vector3(spawnPosition.x, entity.transform.localScale.y + 3.55f, spawnPosition.z);
+        }
 
         return entity;
     }
 
     private GameObject GetMashroomPrefab(Vector3 spawnPosition)
     {
-        mushroomIndex = (mushroomIndex + 1) % (mushroomPrefabs.Count - 1);
+        mushroomIndex = (mushroomIndex + 1) % mushroomPrefabs.Count;
         return Instantiate(mushroomPrefabs[mushroomIndex], spawnPosition, Quaternion.identity);
     }
 }

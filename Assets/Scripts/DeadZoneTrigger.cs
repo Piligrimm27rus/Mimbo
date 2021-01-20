@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class DeadZoneTrigger : MonoBehaviour
 {
@@ -9,7 +7,7 @@ public class DeadZoneTrigger : MonoBehaviour
         switch (collision.gameObject.tag)
         {
             case "Player":
-                //GameOver
+                GameManager.instance.GameOver();
                 break;
             case "Entity":
             case "Coin":

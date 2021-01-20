@@ -23,9 +23,17 @@ public class EnityMovement : MonoBehaviour
     private Vector3 rayDir; //в какую сторону падает луч
     private float j; //
 
+    AntityAnimation animation;
+
     private void Start()
     {
         rigidbody = GetComponent<Rigidbody>();
+        animation = new AntityAnimation(transform);
+
+        if (animation.moveAnim != null)
+        {
+            animation.moveAnim.SetBool("IsMove", true);
+        }
     }
 
     private void Update()
@@ -84,7 +92,7 @@ public class EnityMovement : MonoBehaviour
 
     private void ThrowRay(Vector3 direction) //Выпуск луча
     {
-        Vector3 startRayVector = new Vector3(transform.position.x, 1.5f, transform.position.z);
+        Vector3 startRayVector = new Vector3(transform.position.x, 2.5f, transform.position.z);
 
         Debug.DrawRay(startRayVector, direction * rayDistance, Color.red);
 

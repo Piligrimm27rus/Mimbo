@@ -3,24 +3,33 @@ using UnityEngine.SceneManagement;
 
 public class Eatable : MonoBehaviour
 {
+    AntityAnimation animation;
+
+    private void Start()
+    {
+        animation = new AntityAnimation(transform);
+    }
+
     //transform - тот кто ест
     //collision - кого едят
 
     private void OnTriggerEnter(Collider other)
     {
-        if (transform.GetComponent<SpawnEntity>() == null)
+        if (other.transform.GetComponent<SpawnEntity>() == null)
         {
             if (transform.CompareTag("Player") && other.gameObject.CompareTag("Entity")) //если игрок
             {
                 if (transform.localScale.y >= other.transform.localScale.y) //если размер игрока такой же или больше
                 {
+                    GetComponent<PlayerMovement>().eatParticle.Play(); //убейте за такое
                     GameManager.instance.score++;
+                    GameManager.instance.ScoreUpdate();
                     EatEntity(other);
                 }
             }
             else if (transform.CompareTag("Player") && other.gameObject.CompareTag("Coin"))
             {
-                Debug.Log("+1 монетка");
+                GameManager.instance.Money++;
                 EatEntity(other);
             }
             else if (transform.CompareTag("Player") && other.gameObject.CompareTag("Mushroom"))
@@ -66,6 +75,7 @@ public class Eatable : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             other.gameObject.GetComponent<PlayerMovement>().enabled = false;
+            GameManager.instance.GameOver();
         }
         else
         {
@@ -76,8 +86,14 @@ public class Eatable : MonoBehaviour
         other.gameObject.GetComponent<CapsuleCollider>().enabled = false;
 
         other.transform.SetParent(transform);
-        other.transform.localPosition = new Vector3(0, transform.position.y + other.transform.localScale.y, 0);
+        other.transform.localPosition = new Vector3(0, 5f, 0);
         other.transform.rotation = Quaternion.Euler(180, 0, 0);
+
         EnityManager.instance.RemoveAndDestroyObjectInEnityList(other.gameObject, 0.5f);
+
+        if (animation.bodyAnim != null)
+        {
+            animation.bodyAnim.SetTrigger("Eat");
+        }
     }
 }

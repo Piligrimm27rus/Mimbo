@@ -13,26 +13,35 @@ public class PlayerMovement : MonoBehaviour
     Vector2 inputPointB;
     bool isTouched;
 
+    AntityAnimation animation;
+
+    [SerializeField] ParticleSystem moveParticle;
+    public ParticleSystem eatParticle;
+
     private void Start()
     {
         player_rb = GetComponent<Rigidbody>();
+        animation = new AntityAnimation(transform);
     }
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (OnLoadSettings.gameEvent == GameEvent.InGame)
         {
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas, Input.mousePosition, Camera.main, out inputPointA);
+            if (Input.GetMouseButtonDown(0))
+            {
+                RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas, Input.mousePosition, Camera.main, out inputPointA);
 
-        }
-        if (Input.GetMouseButton(0))
-        {
-            isTouched = true;
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas, Input.mousePosition, Camera.main, out inputPointB);
-        }
-        else
-        {
-            isTouched = false;
+            }
+            if (Input.GetMouseButton(0))
+            {
+                isTouched = true;
+                RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas, Input.mousePosition, Camera.main, out inputPointB);
+            }
+            else
+            {
+                isTouched = false;
+            }
         }
     }
     private void FixedUpdate()
@@ -41,14 +50,33 @@ public class PlayerMovement : MonoBehaviour
         {
             Vector2 offset = inputPointB - inputPointA;
             Vector2 direction = Vector2.ClampMagnitude(offset, 1f);
+            
+            if (offset.magnitude > 0.1f)
+            {
+                //move
+                player_rb.MovePosition(player_rb.position + new Vector3(direction.x, 0, direction.y) * Time.deltaTime * speed);
+                animation.moveAnim.SetBool("IsMove", true);
 
-            //move
-            player_rb.MovePosition(player_rb.position + new Vector3(direction.x, 0, direction.y) * Time.deltaTime * speed);
+                //rotation
+                float angle;
+                angle = Mathf.Atan2(direction.x, direction.y) * Mathf.Rad2Deg + rotationOffset;
+                player_rb.transform.rotation = Quaternion.Euler(new Vector3(0, angle, 0));
 
-            //rotation
-            float angle;
-            angle = Mathf.Atan2(direction.x, direction.y) * Mathf.Rad2Deg + rotationOffset;
-            player_rb.transform.rotation = Quaternion.Euler(new Vector3(0, angle, 0));
+
+                if (!moveParticle.isPlaying)
+                {
+                    moveParticle.Play();
+                }
+            }
+        }
+        else
+        {
+            animation.moveAnim.SetBool("IsMove", false);
+
+            if (moveParticle.isPlaying)
+            {
+                moveParticle.Stop();
+            }
         }
     }
 }
